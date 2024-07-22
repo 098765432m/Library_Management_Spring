@@ -1,4 +1,4 @@
-package com.project.Library_Management_Spring_BackEnd.dto;
+package com.project.Library_Management_Spring_BackEnd.dto.request;
 
 import java.time.LocalDate;
 

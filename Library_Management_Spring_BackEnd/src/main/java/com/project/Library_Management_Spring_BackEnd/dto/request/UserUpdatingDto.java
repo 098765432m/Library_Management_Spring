@@ -1,37 +1,22 @@
-package com.project.Library_Management_Spring_BackEnd.dto;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+package com.project.Library_Management_Spring_BackEnd.dto.request;
 
 import java.time.LocalDate;
 
-public class UserCreationDto {
+public class UserUpdatingDto {
 
-    @NotNull(message = "Username không dược để trống")
-    @Size(min = 3, message = "Username có ít hơn 3 ký tự")
-    private String username;
-
-    @NotNull(message = "Mật khẩu không được để trống")
-    @Size(min = 3, message = "Mật khẩu có ít hơn 3 ký tự")
     private String password;
     private String firstName;
     private String lastName;
     private LocalDate dob;
 
-    public String getUsername() {
-        return username;
+    public UserUpdatingDto() {
     }
 
-    public UserCreationDto(String username, String password, String firstName, String lastName, LocalDate dob) {
-        this.username = username;
+    public UserUpdatingDto(String password, String firstName, String lastName, LocalDate dob) {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dob = dob;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
