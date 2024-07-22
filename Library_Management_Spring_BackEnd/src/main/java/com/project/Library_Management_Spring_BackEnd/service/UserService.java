@@ -5,12 +5,9 @@ import com.project.Library_Management_Spring_BackEnd.dto.UserDto;
 import com.project.Library_Management_Spring_BackEnd.dto.UserUpdatingDto;
 import com.project.Library_Management_Spring_BackEnd.entity.User;
 import com.project.Library_Management_Spring_BackEnd.repository.UserRepository;
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindException;
 
 import java.util.List;
 
