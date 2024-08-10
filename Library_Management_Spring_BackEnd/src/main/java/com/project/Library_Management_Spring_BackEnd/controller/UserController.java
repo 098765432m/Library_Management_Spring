@@ -6,7 +6,11 @@ import com.project.Library_Management_Spring_BackEnd.dto.request.UserDto;
 import com.project.Library_Management_Spring_BackEnd.dto.request.UserUpdatingDto;
 import com.project.Library_Management_Spring_BackEnd.service.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     @Autowired
@@ -23,7 +28,11 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasAuthority('DELETE_USER')")
     public ApiResponse<List<UserDto>> getUsers(){
+        log.info("In method of users");
+
         ApiResponse<List<UserDto>> apiResponse = new ApiResponse<>();
 
         apiResponse.setResult(userService.getAll());
@@ -36,6 +45,16 @@ public class UserController {
         ApiResponse<UserDto> apiResponse = new ApiResponse<>();
 
         apiResponse.setResult(userService.getOne(id));
+
+        return apiResponse;
+    }
+
+    @GetMapping("/myInfo")
+    @PostAuthorize("returnObject.result.username == authentication.name")
+    public ApiResponse<UserDto> getMyInfo(){
+        ApiResponse<UserDto> apiResponse = new ApiResponse<>();
+
+        apiResponse.setResult(userService.getMyInfo());
 
         return apiResponse;
     }

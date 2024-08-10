@@ -1,21 +1,14 @@
 package com.project.Library_Management_Spring_BackEnd.dto.response;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class IntrospectResponse {
 
     private boolean valid;
-
-    public IntrospectResponse() {
-    }
-
-    public IntrospectResponse(boolean valid) {
-        this.valid = valid;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
 }

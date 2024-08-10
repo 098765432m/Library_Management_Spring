@@ -9,6 +9,7 @@ import com.project.Library_Management_Spring_BackEnd.dto.request.AuthenticationR
 import com.project.Library_Management_Spring_BackEnd.dto.request.IntrospectRequest;
 import com.project.Library_Management_Spring_BackEnd.dto.response.AuthenticationResponse;
 import com.project.Library_Management_Spring_BackEnd.dto.response.IntrospectResponse;
+import com.project.Library_Management_Spring_BackEnd.entity.User;
 import com.project.Library_Management_Spring_BackEnd.exception.AppException;
 import com.project.Library_Management_Spring_BackEnd.exception.ErrorCode;
 import com.project.Library_Management_Spring_BackEnd.repository.UserRepository;
@@ -19,12 +20,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 public class AuthenticationService {
@@ -43,7 +45,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
-        var user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        var user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
@@ -52,7 +54,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        var token = generateToken(user.getUsername());
+        var token = generateToken(user);
 
         return new AuthenticationResponse(token, true);
     }
@@ -73,18 +75,18 @@ public class AuthenticationService {
         return new IntrospectResponse(verified && expiryTime.after(new Date()));
     }
 
-    public String generateToken(String username){
+    public String generateToken(User user){
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(user.getUsername())
                 .issuer("0987654632m.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
-                .claim("UserId", "Customize things")
+                .claim("scope", buildScope(user))
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -99,5 +101,21 @@ public class AuthenticationService {
             log.error("Cannot create token for JWT");
             throw new RuntimeException(e);
         }
+    }
+
+    private String buildScope(User user){
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!CollectionUtils.isEmpty(user.getRoles())){
+            user.getRoles().forEach(role ->
+                {
+                    stringJoiner.add("ROLE_" + role.getName());
+                    if(!CollectionUtils.isEmpty(role.getPermissions()))
+                        role.getPermissions()
+                                .forEach(permission -> stringJoiner.add(permission.getName()));
+                }
+            );
+        }
+
+        return stringJoiner.toString();
     }
 }
