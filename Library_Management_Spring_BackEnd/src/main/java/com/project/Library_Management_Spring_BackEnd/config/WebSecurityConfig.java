@@ -33,7 +33,6 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize.requestMatchers(HttpMethod.POST, "/api/users/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/token", "/api/auth/introspect").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/users/").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults());
 
